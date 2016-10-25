@@ -1,0 +1,16 @@
+{% extends "base.html" %}}
+
+{% block content  %}
+
+<ul>
+	{% for suggestion in suggestions  %}
+	<li>{{suggestion}}</li>
+	{% endfor  %}
+</ul>
+
+<form action="/suggestions" method="POST">
+	<label>Suggestion</label><input name="suggestion"></input>
+	<input type="submit"></input>
+</form>
+
+{% endblock %}
