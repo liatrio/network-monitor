@@ -1,0 +1,16 @@
+{% extends "base.html" %}}
+
+{% block content  %}
+
+<ul>
+	{% for hostIP in hostIPs  %}
+	<li>{{hostIP.ip}}, {{hostIP.rtt}}, {{hostIP.jitter}}</li>
+	{% endfor  %}
+</ul>
+
+<form action="/ping" method="POST">
+	<label>Host IP</label><input name="hostIP"></input>
+	<input type="submit"></input>
+</form>
+
+{% endblock %}
