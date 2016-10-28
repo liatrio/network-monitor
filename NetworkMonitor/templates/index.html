@@ -1,12 +1,13 @@
 {% extends "base.html" %}}
 
 {% block content  %}
-{% if 'user_id' in session %}
 
-	<p>Logged in as {{ session['user_id'] }}</p>
-	<form action="/logout" method="post">
-    		<button type="submit">Logout</button>
-	</form>
+{% if 'userid' in session %}
+
+<p>Logged in as <a href="/profile">{{ session['userid'] }}</a></p>
+<form action="/logout" method="post">
+    <button type="submit">Logout</button>
+</form>
 
 {% else %}
 
@@ -17,7 +18,9 @@
 
 	<ul>
 	{% for hostIP in hostIPs  %}
-		<li>TIME: {{hostIP.timestamp}} IP: {{hostIP.ip}} MEAN RTT: {{hostIP.rtt}} JITTER: {{hostIP.jitter}}</li>
+
+	<li>TIME: {{hostIP.timestamp}} IP: {{hostIP.ip}} MEAN RTT: {{hostIP.rtt}} JITTER: {{hostIP.jitter}}</li>
+
 	{% endfor  %}
 	</ul>
 
