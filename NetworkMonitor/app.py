@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, session, redirect, abort, flash
+from flask import Flask, render_template, request, session, redirect, abort, flash, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_pymongo import PyMongo    
 from util import ping
 import datetime
+from functools import wraps
 
 app = Flask(__name__)
 app.secret_key = 'development key'
@@ -11,6 +12,17 @@ mongo = PyMongo(app)
 #
 # User Views/Functions
 #
+
+def requires_login(view):
+        """Decorator for views that require login. If user is not logged in,
+        redirects to login page then redirects back after login"""
+        @wraps(view)
+        def decorator(*args, **kwargs):
+            if 'userid' not in session:
+                session['redirect_url'] = request.url
+                return redirect(url_for('login')) 
+            return view(*args, **kwargs)
+        return decorator
 
 def get_user(userid):
     return mongo.db.users.find_one({'userid': userid})
@@ -37,7 +49,7 @@ def login():
             return render_template('login.html', error='Missing field(s).')
         if auth_user(userid, password):
             session['userid'] = userid
-            return redirect('/')
+            return redirect(session.pop('redirect_url', url_for('profile')))
         else:
             return render_template('login.html', error='Incorrect UserID/Password')
 
@@ -66,7 +78,7 @@ def register():
             return render_template('register.html', error='Passwords do not match.')
         user = create_user(userid, password1)
         session['userid'] = userid
-        return redirect('/')
+        return redirect(session.pop('redirect_url', url_for('profile')))
 
     return render_template('register.html')
 
@@ -79,7 +91,6 @@ def register_network():
     """Adds a network to the user's list of networks. 
     Returns False if network already exists."""
     hostname = request.form.get('hostname', None)
-    print(hostname)
     if not hostname:
         flash('bad hostname {}'.format(hostname))
         return redirect('/profile')
@@ -98,13 +109,13 @@ def register_network():
         return redirect('/profile')
     mongo.db.users.update_one({'userid': user['userid']}, {'$push': {'networks': hostname}})
     return redirect('/profile')
+
 #
-# Other
+# Site Views
 #
 
 @app.route('/', methods=('GET', 'POST'))
-def ping_form():
-
+def index():
     error = None
     if request.method == 'POST':
         hostIP = request.form['hostIP']
@@ -120,9 +131,8 @@ def ping_form():
     return render_template('index.html', hostIPs=hostIPs, error=error)
 
 @app.route('/profile', methods=['GET'])
+@requires_login
 def profile():
-    if 'userid' not in session:
-        abort(401) # unauthroized
     user = get_user(session['userid'])
     return render_template('profile.html', user=user)
 

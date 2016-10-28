@@ -2,6 +2,8 @@
 
 {% block content %}
 
+<h2>Overview for {{ session['userid'] }}</h2>
+
 <h3>Networks</h3>
 <ul>
     {% for network in user['networks'] %}
