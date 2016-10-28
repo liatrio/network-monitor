@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, session, redirect, abort
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_pymongo import PyMongo    
 from util import ping
+import datetime
 
 app = Flask(__name__)
 app.secret_key = 'development key'
@@ -106,11 +107,11 @@ def ping_form():
         except ValueError as e:
             error = str(e)
         else:
-            entry = {'hostIP': {'ip': hostIP,'rtt': rtt,'jitter': jitter}}
+            entry = {'hostIP': {'ip': hostIP,'rtt': rtt,'jitter': jitter, 'timestamp': datetime.datetime.utcnow()}}
             result = mongo.db.hostIPs.insert_one(entry)
 
     hostIPs = [obj['hostIP'] for obj in mongo.db.hostIPs.find()]
-    return render_template('ping.html', hostIPs=hostIPs, error=error)
+    return render_template('index.html', hostIPs=hostIPs, error=error)
 
 @app.route('/profile', methods=['GET'])
 def profile():
