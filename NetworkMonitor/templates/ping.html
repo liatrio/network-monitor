@@ -2,6 +2,20 @@
 
 {% block content  %}
 
+{% if 'user_id' in session %}
+
+<p>Logged in as {{ session['user_id'] }}</p>
+<form action="/logout" method="post">
+    <button type="submit">Logout</button>
+</form>
+
+{% else %}
+
+<a href="/login">Login</a>
+<a href="/register">Register</a>
+
+{% endif %}
+
 <ul>
 	{% for hostIP in hostIPs  %}
 	<li>{{hostIP.ip}}, {{hostIP.rtt}}, {{hostIP.jitter}}</li>

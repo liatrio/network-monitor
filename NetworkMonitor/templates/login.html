@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if error %}
+<p style="color: red">{{ error }}</p>
+{% endif %}
+
+<form action="/login" method="post">
+    <label>UserId: </label>
+    <input name="userId"></input>
+    <label>Password: </label>
+    <input type="password" name="password"></input>
+    <button type="submit">Login</button>
+</form>
+
+{% endblock %}
