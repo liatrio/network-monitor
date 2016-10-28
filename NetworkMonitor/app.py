@@ -90,6 +90,11 @@ def register_network():
     if not user or hostname in user['networks']:
         print('Hostname exists ({} in {})'.format(hostname, user['networks']))
         abort(400)
+    # Ensure that network is reachable
+    try:
+        ping(hostname)
+    except ValueError:
+        abort(400)
     mongo.db.users.update_one({'userid': user['userid']}, {'$push': {'networks': hostname}})
     return redirect('/profile')
 #
