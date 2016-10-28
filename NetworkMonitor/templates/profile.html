@@ -11,6 +11,10 @@
     {% endfor %}
 </ul>
 
+{% for error in get_flashed_messages() %}
+<p style="color: red">{{ error }}</p>
+{% endfor %}
+
 <h3>Register Network</h3>
 <form action="/register_network" method="post">
     <label>Hostname</label>

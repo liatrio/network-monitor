@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect, abort
+from flask import Flask, render_template, request, session, redirect, abort, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_pymongo import PyMongo    
 from util import ping
@@ -81,20 +81,21 @@ def register_network():
     hostname = request.form.get('hostname', None)
     print(hostname)
     if not hostname:
-        print('bad hostname {}'.format(hostname))
-        abort(400)
+        flash('bad hostname {}'.format(hostname))
+        return redirect('/profile')
     if not 'userid' in session:
-        print('User not logged in')
-        abort(401)
+        flash('User not logged in')
+        return redirect('/profile')
     user = get_user(session['userid'])
     if not user or hostname in user['networks']:
-        print('Hostname exists ({} in {})'.format(hostname, user['networks']))
-        abort(400)
+        flash('Hostname exists ({} in {})'.format(hostname, user['networks']))
+        return redirect('/profile')
     # Ensure that network is reachable
     try:
         ping(hostname)
     except ValueError:
-        abort(400)
+        flash('{} not reachable'.format(hostname))
+        return redirect('/profile')
     mongo.db.users.update_one({'userid': user['userid']}, {'$push': {'networks': hostname}})
     return redirect('/profile')
 #
