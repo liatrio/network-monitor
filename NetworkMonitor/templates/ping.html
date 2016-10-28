@@ -2,9 +2,9 @@
 
 {% block content  %}
 
-{% if 'user_id' in session %}
+{% if 'userid' in session %}
 
-<p>Logged in as {{ session['user_id'] }}</p>
+<p>Logged in as <a href="/profile">{{ session['userid'] }}</a></p>
 <form action="/logout" method="post">
     <button type="submit">Logout</button>
 </form>

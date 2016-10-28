@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h3>Networks</h3>
+<ul>
+    {% for network in user['networks'] %}
+    <li>{{ network }}</li>
+    {% else %}
+    <li>No registered networks</li>
+    {% endfor %}
+</ul>
+
+<h3>Register Network</h3>
+<form action="/register_network" method="post">
+    <label>Hostname</label>
+    <input name="hostname"></input>
+    <button type="submit">Submit</button>
+</form>
+
+{% endblock %}
