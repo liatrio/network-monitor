@@ -16,20 +16,4 @@
 
 {% endif %}
 
-	<ul>
-	{% for hostIP in hostIPs  %}
-
-	<li>TIME: {{hostIP.timestamp}} IP: {{hostIP.ip}} MEAN RTT: {{hostIP.rtt}} JITTER: {{hostIP.jitter}}</li>
-
-	{% endfor  %}
-	</ul>
-
-{% if error %}
-	<div class="alert alert-danger" role="alert">{{ error  }}</div>
-{% endif %}
-
-	<form action="/" method="POST">
-		<label>Host IP</label><input name="hostIP"></input>
-		<input type="submit"></input>
-	</form>
 {% endblock %}
