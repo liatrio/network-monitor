@@ -114,6 +114,18 @@ def register_network():
         mongo.db.networks.insert_one({'hostname': hostname})
     return redirect('/profile')
 
+def ping_all_networks():
+    with app.app_context():
+        hosts = [obj['hostname'] for obj in mongo.db.networks.find()]
+        for host in hosts:
+            try:
+                rtt, jitter = ping(host)
+            except ValueError:
+                entry = {'hostname': host, 'rtt': 0, 'jitter': 0, 'failed': True}
+            else:
+                entry = {'hostname': host, 'rtt': rtt, 'jitter': jitter, 'failed': False}
+            mongo.db.pings.insert_one(entry)
+
 #
 # Site Views
 #
@@ -128,4 +140,5 @@ def profile():
     user = get_user(session['userid'])
     return render_template('profile.html', user=user)
 
-app.run(host='0.0.0.0', port=8000)
+#app.run(host='0.0.0.0', port=8000)
+ping_all_networks()
