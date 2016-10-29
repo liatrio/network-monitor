@@ -4,6 +4,8 @@ from flask_pymongo import PyMongo
 from util import ping
 import datetime
 from functools import wraps
+from sched import scheduler
+import eventlet
 
 app = Flask(__name__)
 app.secret_key = 'development key'
@@ -76,8 +78,12 @@ def register():
             return render_template('register.html', error='User already exists.')
         if password1 != password2:
             return render_template('register.html', error='Passwords do not match.')
-        user = create_user(userid, password1)
-        session['userid'] = userid
+        try:
+            user = create_user(userid, password1)
+        except ValueError as e:
+            return render_template('register.html', error=str(e))
+        else:
+            session['userid'] = userid
         return redirect(session.pop('redirect_url', url_for('profile')))
 
     return render_template('register.html')
@@ -115,15 +121,34 @@ def register_network():
     return redirect('/profile')
 
 def ping_all_networks():
+    """Pings all networks and recoreds the data in mongo. Multithreaded to
+    increase performance"""
+
+    def get_ping_entry(host):
+        try:
+            rtt, jitter = ping(host)
+        except ValueError:
+            entry = {
+                'hostname': host,
+                'rtt': 0,
+                'jitter': 0,
+                'failed': True,
+                'timestamp': datetime.datetime.utcnow()
+            }
+        else:
+            entry = {
+                'hostname': host,
+                'rtt': rtt,
+                'jitter': jitter,
+                'failed': False,
+                'timestamp': datetime.datetime.utcnow()
+            }
+        return entry
+
     with app.app_context():
         hosts = [obj['hostname'] for obj in mongo.db.networks.find()]
-        for host in hosts:
-            try:
-                rtt, jitter = ping(host)
-            except ValueError:
-                entry = {'hostname': host, 'rtt': 0, 'jitter': 0, 'failed': True}
-            else:
-                entry = {'hostname': host, 'rtt': rtt, 'jitter': jitter, 'failed': False}
+        pool = eventlet.GreenPool()
+        for entry in pool.imap(get_ping_entry, hosts):
             mongo.db.pings.insert_one(entry)
 
 #
