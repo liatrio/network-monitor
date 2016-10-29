@@ -39,8 +39,9 @@ def create_user(userid, password):
 def auth_user(userid, password):
     user = get_user(userid)
     if not user:
-        raise ValueError('User does not exist.')
-    return check_password_hash(user['pwhash'], password)
+        raise ValueError('Invalid Username/Password')
+    if not check_password_hash(user['pwhash'], password):
+        raise ValueError('Invalid Username/Password')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -49,11 +50,13 @@ def login():
         password = request.form.get('password', None)
         if not all([userid, password]):
             return render_template('login.html', error='Missing field(s).')
-        if auth_user(userid, password):
+        try:
+            auth_user(userid, password)
+        except ValueError as e:
+            return render_template('login.html', error=str(e))
+        else:
             session['userid'] = userid
             return redirect(session.pop('redirect_url', url_for('profile')))
-        else:
-            return render_template('login.html', error='Incorrect UserID/Password')
 
     return render_template('login.html')
 
