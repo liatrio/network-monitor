@@ -140,5 +140,4 @@ def profile():
     user = get_user(session['userid'])
     return render_template('profile.html', user=user)
 
-#app.run(host='0.0.0.0', port=8000)
-ping_all_networks()
+app.run(host='0.0.0.0', port=8000)

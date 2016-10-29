@@ -1,19 +1,7 @@
 {% extends "base.html" %}}
 
 {% block content  %}
-
-{% if 'userid' in session %}
-
-<p>Logged in as <a href="/profile">{{ session['userid'] }}</a></p>
-<form action="/logout" method="post">
-    <button type="submit">Logout</button>
-</form>
-
-{% else %}
-
-	<a href="/login">Login</a>
-	<a href="/register">Register</a>
-
-{% endif %}
-
+<div class="jumbotron">
+  <blink style="text-align: center; color: red; font-size: 64px;">WELCOME TO HELL</blink>
+</div>
 {% endblock %}
