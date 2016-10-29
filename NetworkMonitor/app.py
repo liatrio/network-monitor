@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, session, redirect, abort, flash, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_pymongo import PyMongo    
+from flask_pymongo import PyMongo
 from util import ping
 import datetime
 from functools import wraps
@@ -20,7 +20,7 @@ def requires_login(view):
         def decorator(*args, **kwargs):
             if 'userid' not in session:
                 session['redirect_url'] = request.url
-                return redirect(url_for('login')) 
+                return redirect(url_for('login'))
             return view(*args, **kwargs)
         return decorator
 
@@ -88,8 +88,8 @@ def register():
 
 @app.route('/register_network', methods=['POST'])
 def register_network():
-    """Adds a network to the user's list of networks. 
-    Returns False if network already exists."""
+    """Adds a network to the user's list of networks as well as the global
+    network list. Returns False if network already exists."""
     hostname = request.form.get('hostname', None)
     if not hostname:
         flash('bad hostname {}'.format(hostname))
@@ -107,8 +107,24 @@ def register_network():
     except ValueError:
         flash('{} not reachable'.format(hostname))
         return redirect('/profile')
+    # Update user networks
     mongo.db.users.update_one({'userid': user['userid']}, {'$push': {'networks': hostname}})
+    # Update global network list
+    if mongo.db.networks.count({'hostname': hostname}) == 0:
+        mongo.db.networks.insert_one({'hostname': hostname})
     return redirect('/profile')
+
+def ping_all_networks():
+    with app.app_context():
+        hosts = [obj['hostname'] for obj in mongo.db.networks.find()]
+        for host in hosts:
+            try:
+                rtt, jitter = ping(host)
+            except ValueError:
+                entry = {'hostname': host, 'rtt': 0, 'jitter': 0, 'failed': True}
+            else:
+                entry = {'hostname': host, 'rtt': rtt, 'jitter': jitter, 'failed': False}
+            mongo.db.pings.insert_one(entry)
 
 #
 # Site Views
@@ -116,19 +132,7 @@ def register_network():
 
 @app.route('/', methods=('GET', 'POST'))
 def index():
-    error = None
-    if request.method == 'POST':
-        hostIP = request.form['hostIP']
-        try:
-            rtt, jitter = ping(hostIP);
-        except ValueError as e:
-            error = str(e)
-        else:
-            entry = {'hostIP': {'ip': hostIP,'rtt': rtt,'jitter': jitter, 'timestamp': datetime.datetime.utcnow()}}
-            result = mongo.db.hostIPs.insert_one(entry)
-
-    hostIPs = [obj['hostIP'] for obj in mongo.db.hostIPs.find()]
-    return render_template('index.html', hostIPs=hostIPs, error=error)
+    return render_template('index.html')
 
 @app.route('/profile', methods=['GET'])
 @requires_login
@@ -136,5 +140,5 @@ def profile():
     user = get_user(session['userid'])
     return render_template('profile.html', user=user)
 
-app.run(host='0.0.0.0', port=8000)
-
+#app.run(host='0.0.0.0', port=8000)
+ping_all_networks()
