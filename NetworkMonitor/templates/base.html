@@ -25,7 +25,7 @@
             <ul class="nav navbar-nav navbar-right">
     						{% if 'userid' in session %}
                 <li><a href="/profile">{{ session['userid'] }}</a></li>
-    						<form class="navbar-form navbar-right" action="/logout" method="post">
+    						<form class="navbar-form navbar-right" action="/logout" method="post" style="padding-right: 30px;">
     						    <button class="btn btn-inverted" type="submit">Logout</button>
     						</form>
     						{% else %}

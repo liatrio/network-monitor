@@ -3,19 +3,22 @@
 {% block content %}
 
 <div style="padding-left: 10%; padding-right: 10%;">
-{% if error %}
-<div class="alert alert-danger" role="alert">{{ error  }}</div>
-{% endif %}
-   <form action="/login" method="post">
-	<div class="form-group">
-	  <label for="UserId">Username: </label>
-	  <input type="UserID" class="form-control" name="userId"></input>
-	</div>
-	<div class="form-group">
-	  <label for="password">Password:</label>
-	  <input type="password" class="form-control" name="password">
-	</div>
-	<button type="submit" class="btn btn-primary">Submit</button>
-   </form>
-</div>
+<div class="container well" style="width: 60%">
+  <h4><center>Login</center></h4>
+  {% if error %}
+  <div class="alert alert-danger" role="alert">{{ error  }}</div>
+  {% endif %}
+     <form action="/login" method="post">
+  	<div class="form-group">
+  	  <label for="UserId">Username: </label>
+  	  <input type="UserID" class="form-control" name="userId"></input>
+  	</div>
+  	<div class="form-group">
+  	  <label for="password">Password:</label>
+  	  <input type="password" class="form-control" name="password">
+  	</div>
+  	<button type="submit" class="btn btn-primary">Submit</button>
+     </form>
+  </div>
+<div class="container">
 {% endblock %}
