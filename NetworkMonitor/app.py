@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, session, redirect, abort, flash, url_for
+from flask import Flask, render_template, request, session, redirect, abort, flash, url_for, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
+import flask_pymongo
 from flask_pymongo import PyMongo
 from util import ping
 import datetime
@@ -10,6 +11,15 @@ import eventlet
 app = Flask(__name__)
 app.secret_key = 'development key'
 mongo = PyMongo(app)
+
+#
+# Error Response Functions
+#
+
+def error_response(code, message):
+    response = jsonify({'message': message})
+    response.status_code = code
+    return response
 
 #
 # User Views/Functions
@@ -155,6 +165,30 @@ def ping_all_networks():
             mongo.db.pings.insert_one(entry)
 
 #
+# API Views
+#
+
+@app.route('/get-latest-ping')
+def get_latest_ping():
+    hostname = request.args.get('hostname', None)
+    if not hostname:
+        print('Missing paramter "hostname"')
+        return error_response(400, 'Missing parameter "hostname".')
+    entry = mongo.db.pings.find_one(
+        {'hostname': hostname}, sort=[('timestamp', flask_pymongo.DESCENDING)])
+    if not entry:
+        print('No entries for {} found'.format(hostname))
+        return error_response(400, 'No entries for {} found'.format(hostname))
+    print(entry)
+    return jsonify({
+        'hostname': entry['hostname'],
+        'rtt': entry['rtt'],
+        'jitter': entry['jitter'],
+        'failed': entry['failed'],
+        'timestamp': entry['timestamp'],
+    })
+
+#
 # Site Views
 #
 
@@ -168,4 +202,5 @@ def profile():
     user = get_user(session['userid'])
     return render_template('profile.html', user=user)
 
+ping_all_networks()
 app.run(host='0.0.0.0', port=8000)
