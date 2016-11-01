@@ -14,13 +14,12 @@
         <p>Watching your networks so you don't have to!</p>
       </div>
     {% if 'userid' in session %}
-    <a href="/profile">{{ session['userid'] }}</a>
-    <form class="" action="/logout" method="post">
-        <button class="btn btn-inverted" type="submit">Logout</button>
-    </form>
+      <a href="/profile" class="button-primary" role="button">{{ session['userid'] }}</a>
+      <form class="button" action="/logout" method="post">
+          <button class="btn btn-primary" type="submit">Logout</button>
+      </form>
     {% else %}
     <div style="padding-left: 43%; padding-top: 2%;">
-      <div class="btn-toolbar">
         <a href="/login" class="btn btn-primary" role="button">Login</a>
         <a href="/register" class="btn btn-primary" role="button">Register</a>
       </div>
