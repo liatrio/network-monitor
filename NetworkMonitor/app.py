@@ -202,5 +202,12 @@ def profile():
     user = get_user(session['userid'])
     return render_template('profile.html', user=user)
 
+@app.route('/dashboard', methods=['GET'])
+@requires_login
+def dashboard():
+    """Shows all of the user's registered network graphs and data"""
+    networks = mongo.db.users.find_one({'userid': session['userid']})['networks']
+    return render_template('dashboard.html', networks=networks)
+
 ping_all_networks()
 app.run(host='0.0.0.0', port=8000)
