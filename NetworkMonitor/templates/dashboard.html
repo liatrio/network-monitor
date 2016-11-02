@@ -2,10 +2,48 @@
 
 {% block content  %}
 
-{% for network in networks %}
-  <center>
-    <p>{{network}}</p>
-  </center>
-{% endfor %}
+<center>
+  <div id="dashboard"></div>
+</center>
+
+<script type="text/babel">
+
+  class Dashboard extends React.Component {
+    render () {
+      var dashboardElements = this.props.hostnames.map(function(hostname) {
+        return <DashboardElement key={hostname} hostname={hostname} />
+      });
+      return <div>{ dashboardElements }</div>;
+    }
+  }
+
+  class DashboardElement extends React.Component {
+    getLatestPing() {
+      $.ajax({
+        url: '/get-latest-ping',
+        data: {hostname: this.props.hostname},
+        success: function(data) {
+          this.setState({rtt: data.rtt});
+        }.bind(this),
+        error: function() {
+          console.log('Dashboard Error for' + this.props.hostname);
+        }
+      });
+    }
+    constructor(props) {
+      super(props);
+      this.state = {rtt: '?'}
+      this.getLatestPing();
+      setInterval(this.getLatestPing.bind(this), 1500);
+    }
+    render() {
+      return <p>{this.props.hostname}: {this.state.rtt}</p>;
+    }
+  }
+
+  var dashboard = <Dashboard hostnames={['facebook.com', 'google.com']} />
+  ReactDOM.render(dashboard, document.getElementById('dashboard'));
+
+</script>
 
 {% endblock %}
