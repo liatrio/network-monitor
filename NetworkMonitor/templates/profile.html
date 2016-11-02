@@ -1,32 +1,31 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container">
-  <h2>Overview for {{ session['userid'] }}</h2>
+  <div class="container">
+    <h2>Overview for {{ session['userid'] }}</h2>
+    
+    <h3>Networks</h3>
+    {% for network in user['networks'] %}
+    {{ network }}
+    {% else %}
+    No registered networks
+    {% endfor %}
 
-  <h3>Networks</h3>
-  <ul>
-      {% for network in user['networks'] %}
-      <li>{{ network }}</li>
-      {% else %}
-      <li>No registered networks</li>
-      {% endfor %}
-  </ul>
-
-  {% for error in get_flashed_messages() %}
-  <div class="alert alert-danger" role="alert">
-  <strong><center>{{ error }}</center></strong>
-</div>
-  {% endfor %}
-
-  <div class='well'>
-    <h3>Register Network</h3>
-    <form action="/register_network" method="post">
-        <label>Hostname</label>
-        <input name="hostname"></input>
-        <button class="btn btn-primary" type="submit">Submit</button>
-    </form>
+    {% for error in get_flashed_messages() %}
+    <div class="alert alert-danger" role="alert">
+    <strong><center>{{ error }}</center></strong>
   </div>
-</div>
+    {% endfor %}
+     <div style="padding-top: 2%">
+      <div class='well' style="width: 33%;">
+        <h3>Register Network</h3>
+        <form action="/register_network" method="post">
+            <label>Hostname</label>
+            <input name="hostname"></input>
+            <button class="btn btn-primary" type="submit">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
 
 {% endblock %}

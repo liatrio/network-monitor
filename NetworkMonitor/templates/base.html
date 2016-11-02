@@ -11,29 +11,19 @@
 <body>
 	<nav class="navbar navbar-inverse navbar-fixed-top">
   		<div class="container-fluid">
-					<div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="navbar-collapse">
-              <span class="sr-only"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-              <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="/">Network Monitor</a>
-          </div>
-
-          <div class="collapse navbar-collapse text-center" id="global-navbar-collapse">
             <ul class="nav navbar-nav navbar-right">
     						{% if 'userid' in session %}
                 <li><a href="/profile">{{ session['userid'] }}</a></li>
     						<form class="navbar-form navbar-right" action="/logout" method="post" style="padding-right: 30px;">
     						    <button class="btn btn-inverted" type="submit">Logout</button>
     						</form>
+                <li><a href="/dashboard">Dashboard</a></li>
     						{% else %}
     							<li><a href="/login">Login</a></li>
     							<li><a href="/register">Register</a></li>
     						{% endif %}
             </ul>
-  		   </div>
+            <a class="navbar-brand" href="/">Network Monitor</a>
       </div>
 	</nav>
 	<div style="padding-bottom: 70px;"></div>

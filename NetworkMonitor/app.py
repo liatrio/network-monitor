@@ -6,6 +6,7 @@ from util import ping
 import datetime
 from functools import wraps
 from sched import scheduler
+from celery import Celery
 import eventlet
 
 app = Flask(__name__)
