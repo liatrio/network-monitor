@@ -209,5 +209,5 @@ def dashboard():
     networks = mongo.db.users.find_one({'userid': session['userid']})['networks']
     return render_template('dashboard.html', networks=networks)
 
-ping_all_networks()
+#ping_all_networks()
 app.run(host='0.0.0.0', port=8000)
