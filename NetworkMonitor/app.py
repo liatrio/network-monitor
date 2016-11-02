@@ -7,10 +7,37 @@ import datetime
 from functools import wraps
 from sched import scheduler
 import eventlet
+from celery import Celery
+
+
+def make_celery(app):
+    celery = Celery(app.import_name, backend=app.config['CELERY_BACKEND'],
+                    broker=app.config['CELERY_BROKER_URL'])
+    celery.conf.update(app.config)
+    TaskBase = celery.Task
+    class ContextTask(TaskBase):
+        abstract = True
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+    celery.Task = ContextTask
+    return celery
 
 app = Flask(__name__)
 app.secret_key = 'development key'
+app.config['CELERY_BACKEND'] = 'redis://localhost:6379'
+app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379'
+celery = make_celery(app);
 mongo = PyMongo(app)
+
+# Register `ping_all_networks` as a periodic task
+celery.conf.CELERYBEAT_SCHEDULE = {
+    'ping-all-networks-periodically': {
+        'task': 'ping-all-networks',
+        'schedule': datetime.timedelta(seconds=3)
+    }
+}
+celery.conf.CELERY_TIMEZONE = 'UTC'
 
 #
 # Error Response Functions
@@ -133,6 +160,7 @@ def register_network():
         mongo.db.networks.insert_one({'hostname': hostname})
     return redirect('/profile')
 
+@celery.task(name='ping-all-networks')
 def ping_all_networks():
     """Pings all networks and recoreds the data in mongo. Multithreaded to
     increase performance"""
@@ -208,6 +236,3 @@ def dashboard():
     """Shows all of the user's registered network graphs and data"""
     networks = mongo.db.users.find_one({'userid': session['userid']})['networks']
     return render_template('dashboard.html', networks=networks)
-
-#ping_all_networks()
-app.run(host='0.0.0.0', port=8000)
