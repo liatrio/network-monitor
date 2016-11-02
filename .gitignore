@@ -90,3 +90,7 @@ ENV/
 
 # Mac settings
 .DS_Store
+
+# Celery
+celerybeat*
+
