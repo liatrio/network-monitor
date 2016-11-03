@@ -8,12 +8,19 @@
 
 <script type="text/babel">
 
+  console.log({{networks|safe}})
+
   class Dashboard extends React.Component {
     render () {
       var dashboardElements = this.props.hostnames.map(function(hostname) {
         return <DashboardElement key={hostname} hostname={hostname} />
       });
-      return <div>{ dashboardElements }</div>;
+      if (dashboardElements.length == 0) {
+        return <div>No hosts registered! Register hosts at your <a href="/profile">Profile</a>.</div>
+      }
+      else {
+        return <div>{ dashboardElements }</div>;
+      }
     }
   }
 
@@ -41,8 +48,9 @@
     }
   }
 
-  var dashboard = <Dashboard hostnames={['facebook.com', 'google.com']} />
+  var dashboard = <Dashboard hostnames={ {{networks|safe}} } />
   ReactDOM.render(dashboard, document.getElementById('dashboard'));
+
 
 </script>
 
