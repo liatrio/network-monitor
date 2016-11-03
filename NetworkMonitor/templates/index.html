@@ -19,11 +19,10 @@
           <button class="btn btn-primary" type="submit">Logout</button>
       </form>
     {% else %}
-    <div style="padding-left: 43%; padding-top: 2%;">
-        <a href="/login" class="btn btn-primary" role="button">Login</a>
-        <a href="/register" class="btn btn-primary" role="button">Register</a>
-      </div>
-    <div>
+    <div class="row text-center">
+      <div class="col-sm-2 col-sm-offset-4 col-xs-6"><a class="btn btn-primary btn" href="/login">Login</a></div>
+      <div class="col-sm-2 col-xs-6"><a class="btn btn-primary btn" href="/register">Register</a></div>
+    </div>
     {% endif %}
   </center>
 </body>
