@@ -3,10 +3,10 @@
 {% block content %}
   <div class="container">
     <h2>Overview for {{ session['userid'] }}</h2>
-    
+
     <h3>Networks</h3>
     {% for network in user['networks'] %}
-    {{ network }}
+    <li>{{ network }}</li>
     {% else %}
     No registered networks
     {% endfor %}
@@ -17,7 +17,7 @@
   </div>
     {% endfor %}
      <div style="padding-top: 2%">
-      <div class='well' style="width: 33%;">
+      <div class='well' style="width: 66%;">
         <h3>Register Network</h3>
         <form action="/register_network" method="post">
             <label>Hostname</label>
