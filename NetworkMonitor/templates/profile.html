@@ -3,13 +3,17 @@
 {% block content %}
   <div class="container">
     <h2>Overview for {{ session['userid'] }}</h2>
-    
-    <h3>Networks</h3>
+
+    <h3>Hosts</h3>
+    <ul>
     {% for network in user['networks'] %}
-    {{ network }}
+    <li>{{ network }}</li>
     {% else %}
-    No registered networks
+    <li>No registered networks</li>
     {% endfor %}
+  </ul>
+
+  <h3><a href="/dashboard">Dashboard</a></h3>
 
     {% for error in get_flashed_messages() %}
     <div class="alert alert-danger" role="alert">

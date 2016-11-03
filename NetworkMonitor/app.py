@@ -8,6 +8,7 @@ from functools import wraps
 from sched import scheduler
 from celery import Celery
 import eventlet
+import json
 from celery import Celery
 
 
@@ -236,4 +237,8 @@ def profile():
 def dashboard():
     """Shows all of the user's registered network graphs and data"""
     networks = mongo.db.users.find_one({'userid': session['userid']})['networks']
-    return render_template('dashboard.html', networks=networks)
+    print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+    print(json.dumps(networks))
+    print(type(json.dumps(networks)))
+    print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
+    return render_template('dashboard.html', networks=json.dumps(networks))
