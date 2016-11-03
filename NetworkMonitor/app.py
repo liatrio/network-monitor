@@ -36,7 +36,7 @@ mongo = PyMongo(app)
 celery.conf.CELERYBEAT_SCHEDULE = {
     'ping-all-networks-periodically': {
         'task': 'ping-all-networks',
-        'schedule': datetime.timedelta(seconds=3)
+        'schedule': datetime.timedelta(seconds=6)
     }
 }
 celery.conf.CELERY_TIMEZONE = 'UTC'
@@ -237,8 +237,4 @@ def profile():
 def dashboard():
     """Shows all of the user's registered network graphs and data"""
     networks = mongo.db.users.find_one({'userid': session['userid']})['networks']
-    print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
-    print(json.dumps(networks))
-    print(type(json.dumps(networks)))
-    print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@')
     return render_template('dashboard.html', networks=json.dumps(networks))
